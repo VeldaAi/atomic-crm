@@ -1,13 +1,22 @@
 import { add } from "date-fns";
 import { datatype, lorem, random } from "faker/locale/en_US";
 
-import {
-  defaultDealCategories,
-  defaultDealStages,
-} from "../../../root/defaultConfiguration";
 import type { Deal } from "../../../types";
 import type { Db } from "./types";
 import { randomDate } from "./utils";
+
+// FakeRest builds records before it reads <CRM> props. These values are the
+// roofing lists in demo/App.tsx and src/App.tsx, so each stage column and
+// each category actually occurs in the generated deals.
+const demoDealStageValues = [
+  "new-lead",
+  "inspection-booked",
+  "quote-sent",
+  "won",
+  "lost",
+] as const;
+
+const demoDealCategoryValues = ["repair", "full-roof", "gutters"] as const;
 
 export const generateDeals = (db: Db): Deal[] => {
   const deals = Array.from(Array(50).keys()).map((id) => {
@@ -32,8 +41,8 @@ export const generateDeals = (db: Db): Deal[] => {
       name: lowercaseName[0].toUpperCase() + lowercaseName.slice(1),
       company_id: company.id,
       contact_ids: contacts.map((contact) => contact.id),
-      categories: [random.arrayElement(defaultDealCategories).value],
-      stage: random.arrayElement(defaultDealStages).value,
+      categories: [demoDealCategoryValues[id % demoDealCategoryValues.length]],
+      stage: demoDealStageValues[id % demoDealStageValues.length],
       description: lorem.paragraphs(datatype.number({ min: 1, max: 4 })),
       amount: datatype.number(1000) * 100,
       created_at,
@@ -44,9 +53,9 @@ export const generateDeals = (db: Db): Deal[] => {
     };
   });
   // compute index based on stage
-  defaultDealStages.forEach((stage) => {
+  demoDealStageValues.forEach((stage) => {
     deals
-      .filter((deal) => deal.stage === stage.value)
+      .filter((deal) => deal.stage === stage)
       .forEach((deal, index) => {
         deals[deal.id].index = index;
       });

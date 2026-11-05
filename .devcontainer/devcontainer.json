@@ -6,6 +6,7 @@
   },
   "workspaceFolder": "/workspaces/atomic-crm",
   "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind,consistency=cached",
+  "initializeCommand": "bash .devcontainer/ensure-claude-mounts.sh",
   "postCreateCommand": "bash .devcontainer/post-create.sh",
   "remoteUser": "node",
   "features": {
